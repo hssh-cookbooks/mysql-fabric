@@ -1,10 +1,10 @@
 #
 # Cookbook Name:: mysql-fabric
-# Recipe:: default
+# Attribute:: default
 #
 # The MIT License (MIT)
 # 
-# Copyright (c) 2015 Hisashi kOMINE
+# Copyright (c) 2015 Hisashi KOMINE
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -24,37 +24,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-include_recipe 'mysql56'
-
-template '/etc/mysql/fabric-init.sql' do
-  source 'fabric-init.sql.erb'
-  mode   0600
-  variables config: node['mysql-fabric']
-  notifies :run, 'execute[fabric-init]', :immediately
-end
-execute 'fabric-init' do
-  command 'mysql -u root < /etc/mysql/fabric-init.sql'
-  action :nothing
-end
-
-template '/etc/mysql/fabric.cfg' do
-  source 'fabric.cfg.erb'
-  mode   0600
-  variables config: node['mysql-fabric']
-  notifies :run, 'execute[fabric-setup]', :immediately
-end
-execute 'fabric-setup' do
-  command 'mysqlfabric manage setup'
-  notifies :run, 'execute[fabric-restart]'
-  action :nothing
-end
-
-execute 'fabric-restart' do
-  command <<-EOC
-    if mysqlfabric manage ping; then
-      mysqlfabric manage stop
-    fi
-    mysqlfabric manage start --daemonize
-  EOC
-  action :nothing
-end
+#
+# MySQL Fabric configurations
+#
+default['mysql-fabric'] = {
+  'storage' => {'password' => 'fabric'},
+  'protocol.xmlrpc' => {'password' => 'fabric'},
+  'protocol.mysql' => {'password' => 'fabric'},
+}

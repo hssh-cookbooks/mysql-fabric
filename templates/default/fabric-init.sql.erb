@@ -1,0 +1,2 @@
+CREATE USER 'fabric'@'localhost' IDENTIFIED BY '<%= @config['storage']['password'] %>';
+GRANT ALL ON fabric.* TO 'fabric'@'localhost';
